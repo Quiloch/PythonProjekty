@@ -19,36 +19,40 @@ def pobierz_stawke(aktualne_saldo):
        
 while saldo > 0:
     print("saldo: ", saldo)
-    poziom = int(input(f"Na jakim poziomie chcesz zagrać? (łatwy - 1/trudny - 2)\n"))
-    stawka = pobierz_stawke(saldo)
-    saldo -= stawka
+    try:
+        poziom = int(input(f"Na jakim poziomie chcesz zagrać? (łatwy - 1/trudny - 2)\n"))
+        stawka = pobierz_stawke(saldo)
+        saldo -= stawka
+    except ValueError:
+        print("Podana wartosc nie jest liczba")
+        continue
 
     if poziom == 1:
         wylosowana_liczba = random.randint(1,3)
         try:
             typowanie_gracza = int(input("Jaka liczba (1-3) została wylosowana?\n"))
-            if wylosowana_liczba == typowanie_gracza:
-                stawka *= mnozniki["łatwy"]
-                saldo += stawka
-                historia_gier.append("wygrana")
-                print("wylosowana liczba to: ", wylosowana_liczba)
-            else:
-                print("Tym razem sie nie udalo, wylosowana liczba to: ", wylosowana_liczba)
-                historia_gier.append("Przegrana")
         except ValueError:
             print("Podana wartosc nie jest liczba") 
+        if wylosowana_liczba == typowanie_gracza:
+            stawka *= mnozniki["łatwy"]
+            saldo += stawka
+            historia_gier.append("wygrana")
+            print("wylosowana liczba to: ", wylosowana_liczba)
+        else:
+            print("Tym razem sie nie udalo, wylosowana liczba to: ", wylosowana_liczba)
+            historia_gier.append("Przegrana")
 
     elif poziom == 2:
         wylosowana_liczba = random.randint(1,10)
         try:
             typowanie_gracza = int(input(f"Jaka liczba (1-10) została wylosowana\n"))
-            if wylosowana_liczba == typowanie_gracza:
-                stawka *= mnozniki["trudny"]
-                saldo += stawka
-                historia_gier.append("wygrana")
-                print("wylosowana liczba to: ", wylosowana_liczba)
-            else:
-                print("Tym razem sie nie udalo, wylosowana liczba to: ", wylosowana_liczba)
-                historia_gier.append("Przegrana")
         except ValueError:
             print("Podana wartosc nie jest liczba")
+        if wylosowana_liczba == typowanie_gracza:
+            stawka *= mnozniki["trudny"]
+            saldo += stawka
+            historia_gier.append("wygrana")
+            print("wylosowana liczba to: ", wylosowana_liczba)
+        else:
+            print("Tym razem sie nie udalo, wylosowana liczba to: ", wylosowana_liczba)
+            historia_gier.append("Przegrana")
