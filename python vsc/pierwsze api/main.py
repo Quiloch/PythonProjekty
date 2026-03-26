@@ -1,24 +1,45 @@
 from fastapi import FastAPI
+import requests
 
-# 1. Tworzymy główny obiekt naszej aplikacji (naszą "restaurację")
 app = FastAPI()
 
-# 2. Tworzymy pierwszy endpoint (ścieżkę główną: "/")
-# Metoda GET oznacza, że ktoś chce "pobrać" dane (jak przez przeglądarkę)
+wspolrzedne_miast = {
+    "Warszawa": {"lat": 52.23, "lon": 21.01},
+    "Krakow": {"lat": 50.06, "lon": 19.94},
+    "Myszkow": {"lat": 50.57, "lon": 19.32},
+    "Gdansk": {"lat": 54.35, "lon": 18.64}
+}
+
 @app.get("/")
 def powitanie():
-    # Zwracamy zwykły słownik, FastAPI samo zrobi z tego JSON!
-    return {
-        "wiadomosc": "Witaj na moim pierwszym własnym serwerze!",
-        "autor": "Inżynier Pythona",
-        "status": "Działa perfekcyjnie"
-    }
+    return {"wiadomosc": "Witaj w API Pogodowym Inżyniera!"}
 
-# 3. Dodajmy drugi endpoint (ścieżkę "/pogoda")
+# Endpoint do pobierania pogody dla danego miasta
 @app.get("/pogoda")
-def pokaz_pogode():
-    return {
-        "miasto": "Warszawa",
-        "temperatura": 15.2,
-        "opis": "Słonecznie z przelotnym kodowaniem"
-    }
+def podaj_pogode(miasto: str):
+    # Sprawdzenie miasta
+    if miasto not in wspolrzedne_miast:
+        return {"blad": f"Nie znamy miasta: {miasto}. Dostępne miasta to: Warszawa, Krakow, Myszkow, Gdansk."}
+    
+    # Wyciagniecie wspolrzednych dla miasta
+    lat = wspolrzedne_miast[miasto]["lat"]
+    lon = wspolrzedne_miast[miasto]["lon"]
+    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+    
+    # Zapytanie do serwera Open-Meteo
+    odpowiedz = requests.get(url)
+    
+    # Zwrot danych po pozytywnym zapytaniu
+    if odpowiedz.status_code == 200:
+        dane_pogodowe = odpowiedz.json()
+        temperatura = dane_pogodowe["current_weather"]["temperature"]
+        
+        # Zwracanie danych pogodowych w formacie JSON
+        return {
+            "miasto": miasto,
+            "temperatura": temperatura,
+            "jednostka": "°C",
+            "status": "Sukces"
+        }
+    else:
+        return {"blad": "Problem z zewnętrznym dostawcą pogody."}
