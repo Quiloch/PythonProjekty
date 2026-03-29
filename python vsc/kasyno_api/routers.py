@@ -1,11 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 import random
 from sqlalchemy.orm import Session
 from database import SessionLocal
+import crud, schemas
 
-# Importujemy rzeczy z wlasnych plikow
-from schemas import PaczkaZakladu, PaczkaDoladowania
-import state
 
 # Tworzymy router (zamiast app = FastAPI())
 router = APIRouter()
@@ -19,13 +17,32 @@ def get_db():
         db.close() #zamkniecie sesji, gdy endpoint skonczy prace, polaczenie ZAWSZE jest zamkniete
 
 
+#endpoint do rejestracji gracza, przyjmuje dane z requesta, tworzy gracza w bazie danych i zwraca informacje o nim
+@router.post("/rejestracja", response_model=schemas.GraczResponse)
+def zarejestruj_gracza(gracz: schemas.GraczCreate, db: Session = Depends(get_db)):
+    utworzony_gracz = crud.stworz_gracza(db=db, gracz=gracz)
+    return utworzony_gracz
+
+
+#endpoint do sprawdzania stanu konta gracza, przyjmuje ID gracza jako parametr, pobiera informacje o graczu z bazy danych i zwraca je
+@router.get("/konto/{gracz_id}", response_model=schemas.GraczResponse)
+def sprawdz_konto(gracz_id: int, db: Session = Depends(get_db)):
+    gracz = crud.pobierz_gracza(db, gracz_id=gracz_id)
+
+    #zabezpieczenie przed brakiem gracza o podanym ID
+    if gracz is None:
+        raise HTTPException(status_code=404, detail="Nie znaleziono takiego gracza")
+    
+    return gracz
+
+
 @router.get("/test_bazy")
 def test_polaczenia(db: Session = Depends(get_db)):
     #depends "mowi" do FastApi ze przed wywolaniem tej funkcji, musi wywolac get_db() i przekazac wynik jako argument db
     return {"status": "Połączenie z bazą działa", "typ_sesji": str(type(db))}
 
 
-@router.get("/konto")
+'''@router.get("/konto")
 def sprawdz_konto():
     return {
         "aktualne_saldo": state.saldo_gracza,
@@ -73,3 +90,5 @@ def zagraj_w_kasynie(zaklad: PaczkaZakladu):
 def doladuj_konto(doladowanie: PaczkaDoladowania):
     state.saldo_gracza += doladowanie.kwota
     return {"wiadomosc": "Konto zasilone!", "nowe_saldo": state.saldo_gracza}
+
+'''
