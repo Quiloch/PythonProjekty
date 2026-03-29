@@ -50,42 +50,43 @@ def sprawdz_konto():
         "historia": state.historia_gier
     }
 
-
+'''
 @router.post("/zagraj")
-def zagraj_w_kasynie(zaklad: PaczkaZakladu):
+def zagraj_w_kasynie(zaklad: schemas.PaczkaZakladu, db: Session = Depends(get_db)):
+    #szukanie gracza w bazie
+    gracz = crud.pobierz_gracza(db, gracz_id=zaklad.gracz_id)
+    if not gracz:
+        raise HTTPException(status_code=404, detail="Nie znaleziono takiego gracza")
+    
     # Używamy state.saldo_gracza, nie ma juz zmiennych globalnych
     if zaklad.stawka > state.saldo_gracza:
-        return {"blad": "Nie masz wystarczających środków!", "twoje_saldo": state.saldo_gracza}
+        raise HTTPException(status_code=400, detail="Nie masz wystarczająco środków na koncie!")
     if zaklad.stawka <= 0:
-        return {"blad": "Stawka musi być większa niż 0!"}
-        
-    state.saldo_gracza -= zaklad.stawka
-    
+        raise HTTPException(status_code=400, detail="Stawka musi być większa niż 0!")        
+    mnozniki = {1: 2, 2: 5} #mnozniki dla poziomow, mozna tez trzymac w bazie danych
     if zaklad.poziom == 1:
         wylosowana = random.randint(1, 3)
-    elif zaklad.poziom == 2:
+    else:
         wylosowana = random.randint(1, 10)
-    else:
-        state.saldo_gracza += zaklad.stawka 
-        return {"blad": "Nieznany poziom! Wybierz 1 lub 2."}
-        
+    
     if zaklad.typowanie == wylosowana:
-        wygrana = zaklad.stawka * state.mnozniki[zaklad.poziom]
-        state.saldo_gracza += wygrana
+        wygrana_kwota = (zaklad.stawka * mnozniki[zaklad.poziom]) #obliczenie wygranej na podstawie stawki i mnoznika
+        zmiana_salda = wygrana_kwota
         wynik = "Wygrałeś!"
-        state.historia_gier.append(f"Wygrana: {wygrana} zł (Poziom: {zaklad.poziom})")
     else:
+        zmiana_salda -= zaklad.stawka #przegrana, odejmujemy stawke od salda
         wynik = "Przegrałeś!"
-        state.historia_gier.append(f"Przegrana: {zaklad.stawka} zł (Poziom: {zaklad.poziom})")
+
+    zaktualizowany_gracz = crud.zmien_saldo(db, gracz_id=zaklad.gracz_id, kwota=zmiana_salda)
         
     return {
         "wynik_gry": wynik,
         "wylosowana_liczba": wylosowana,
         "twoje_typowanie": zaklad.typowanie,
-        "nowe_saldo": state.saldo_gracza
+        "nowe_saldo": zaktualizowany_gracz.saldo
     }
 
-'''
+
 @router.post("/doladuj", response_model=schemas.GraczResponse)
 def doladuj_konto(doladowanie: schemas.PaczkaDoladowania, db: Session = Depends(get_db)):
     #sprawdzenie czy gracz istnieje
