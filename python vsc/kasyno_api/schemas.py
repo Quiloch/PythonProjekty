@@ -6,6 +6,7 @@ class PaczkaZakladu(BaseModel):
     typowanie: int
 
 class PaczkaDoladowania(BaseModel):
+    gracz_id: int #Dodany parametr, aby moc identyfikowac gracza
     kwota: int
 
 #odebrane dane z formularza rejestracji
