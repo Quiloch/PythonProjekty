@@ -23,3 +23,14 @@ def stworz_gracza(db: Session, gracz: schemas.GraczCreate):
 def pobierz_gracza(db: Session, gracz_id: int):
     #Przetlumaczenie na SQL: SELECT * FROM gracz WHERE id = gracz_id)
     return db.query(models.Gracz).filter(models.Gracz.id == gracz_id).first()
+
+#Aktualizacja salda (U)
+def dodaj_do_salda(db: Session, gracz_id: int, kwota: int):
+    gracz = pobierz_gracza(db, gracz_id)
+
+    if gracz:
+        gracz.saldo += kwota
+        db.commit()
+        db.refresh(gracz)
+    
+    return gracz
