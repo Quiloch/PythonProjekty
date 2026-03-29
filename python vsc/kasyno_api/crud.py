@@ -4,8 +4,8 @@ import models, schemas
 
 #Tworzenie nowego gracza (C)
 def stworz_gracza(db: Session, gracz: schemas.GraczCreate):
-    #Stworzenie obiektu gracza (saldo zostaje pominiete i automatycznie bedzie ustawione na 100)
-    nowy_gracz = models.Gracz(nazwa=gracz.nazwa)
+    #Stworzenie obiektu gracza
+    nowy_gracz = models.Gracz(nazwa=gracz.nazwa, saldo=100)
 
     #Dodanie gracza do bazy danych
     db.add(nowy_gracz)
