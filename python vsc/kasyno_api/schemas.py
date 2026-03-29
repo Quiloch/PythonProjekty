@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 class PaczkaZakladu(BaseModel):
+    gracz_id: int #Dodany parametr, aby moc identyfikowac gracza
     poziom: int
     stawka: int
     typowanie: int
@@ -22,3 +23,4 @@ class GraczResponse(BaseModel):
     #aby pydantic mogl tworzyc obiekty z danych otrzymanych z bazy danych, ktore sa w formie dict
     class Config:
         from_attributes = True
+
