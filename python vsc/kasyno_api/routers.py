@@ -1,5 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 import random
+from sqlalchemy.orm import Session
+from database import SessionLocal
 
 # Importujemy rzeczy z wlasnych plikow
 from schemas import PaczkaZakladu, PaczkaDoladowania
@@ -8,6 +10,21 @@ import state
 # Tworzymy router (zamiast app = FastAPI())
 router = APIRouter()
 
+#stworzenie logiki otwierania i zamykania sesji bazy danych
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db #zatrzymanie sie kodu w tym miejscu, przekazanie bazy danych do endpoitu
+    finally:
+        db.close() #zamkniecie sesji, gdy endpoint skonczy prace, polaczenie ZAWSZE jest zamkniete
+
+
+@router.get("/test_bazy")
+def test_polaczenia(db: Session = Depends(get_db)):
+    #depends "mowi" do FastApi ze przed wywolaniem tej funkcji, musi wywolac get_db() i przekazac wynik jako argument db
+    return {"status": "Połączenie z bazą działa", "typ_sesji": str(type(db))}
+
+
 @router.get("/konto")
 def sprawdz_konto():
     return {
@@ -15,6 +32,7 @@ def sprawdz_konto():
         "rozegrane_gry": len(state.historia_gier),
         "historia": state.historia_gier
     }
+
 
 @router.post("/zagraj")
 def zagraj_w_kasynie(zaklad: PaczkaZakladu):
@@ -49,6 +67,7 @@ def zagraj_w_kasynie(zaklad: PaczkaZakladu):
         "twoje_typowanie": zaklad.typowanie,
         "nowe_saldo": state.saldo_gracza
     }
+
 
 @router.post("/doladuj")
 def doladuj_konto(doladowanie: PaczkaDoladowania):
