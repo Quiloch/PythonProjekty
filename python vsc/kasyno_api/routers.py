@@ -85,10 +85,19 @@ def zagraj_w_kasynie(zaklad: PaczkaZakladu):
         "nowe_saldo": state.saldo_gracza
     }
 
-
-@router.post("/doladuj")
-def doladuj_konto(doladowanie: PaczkaDoladowania):
-    state.saldo_gracza += doladowanie.kwota
-    return {"wiadomosc": "Konto zasilone!", "nowe_saldo": state.saldo_gracza}
-
 '''
+@router.post("/doladuj", response_model=schemas.GraczResponse)
+def doladuj_konto(doladowanie: schemas.PaczkaDoladowania, db: Session = Depends(get_db)):
+    #sprawdzenie czy gracz istnieje
+    gracz = crud.pobierz_gracza(db, gracz_id=doladowanie.gracz_id)
+    if not gracz:
+        raise HTTPException(status_code=404, detail="Nie znaleziono takiego gracza")
+    
+    #sprawdzenie czy kwota doladowania jest dodatnia
+    if doladowanie.kwota <= 0:
+        raise HTTPException(status_code=400, detail="Kwota doładowania musi być większa niż 0")
+    
+    #aktualizacja salda gracza w bazie danych
+
+    zaktualizowany_gracz = crud.dodaj_do_salda(db, gracz_id=doladowanie.gracz_id, kwota=doladowanie.kwota)
+    return zaktualizowany_gracz
