@@ -1,5 +1,29 @@
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 from main import app
+from database import Base
+from routers import get_db
+
+# stworzenie osobnej bazy danych dla testow, aby nie ingerowac w glowna baze danych
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test_kasyno.db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# utworzenie pustych tabel w bazie danych testowej
+Base.metadata.create_all(bind=engine)
+
+# utworzenie funkcji, ktora bedzie zwracac sesje do bazy danych testowej
+def override_get_db():
+    try:
+        db = TestingSessionLocal()
+        yield db
+    finally:
+        db.close()
+
+# podmiana bazy danych w aplikacji na baze testowa
+app.dependency_overrides[get_db] = override_get_db
 
 # utworzenie wirtualnego klienta, ktory bedzie udawal uzytkownika korzystajacego z API
 client = TestClient(app)
@@ -29,4 +53,4 @@ def test_sprawdz_konto_gracza():
     # rozpakowanie JSON z odpowiedzi i sprawdzenie danych
     dane = odpowiedz.json()
     assert dane["id"] == 1
-    #assert dane["saldo"] == 100
+    assert dane["saldo"] == 100
