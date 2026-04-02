@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class PaczkaZakladu(BaseModel):
     gracz_id: int #Dodany parametr, aby moc identyfikowac gracza
@@ -20,7 +20,5 @@ class GraczResponse(BaseModel):
     nazwa: str
     saldo: int
 
-    #aby pydantic mogl tworzyc obiekty z danych otrzymanych z bazy danych, ktore sa w formie dict
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
