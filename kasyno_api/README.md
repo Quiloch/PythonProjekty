@@ -27,7 +27,7 @@ Aplikacja symuluje architekturę prawdziwych systemów finansowych: posiada wyra
    ```bash
    pip install -r requirements.txt
 3. Uruchom serwer developerski Uvicorn:
-    Bash
+    ```bash
     uvicorn main:app --reload
 4. Baza danych (kasyno.db) wygeneruje się automatycznie przy pierwszym uruchomieniu.
 
