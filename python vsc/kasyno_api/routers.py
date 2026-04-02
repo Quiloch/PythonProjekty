@@ -59,11 +59,14 @@ def zagraj_w_kasynie(zaklad: schemas.PaczkaZakladu, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="Nie znaleziono takiego gracza")
     
     # Używamy state.saldo_gracza, nie ma juz zmiennych globalnych
-    if zaklad.stawka > state.saldo_gracza:
+    if zaklad.stawka > gracz.saldo:
         raise HTTPException(status_code=400, detail="Nie masz wystarczająco środków na koncie!")
     if zaklad.stawka <= 0:
-        raise HTTPException(status_code=400, detail="Stawka musi być większa niż 0!")        
+        raise HTTPException(status_code=400, detail="Stawka musi być większa niż 0!") 
+           
     mnozniki = {1: 2, 2: 5} #mnozniki dla poziomow, mozna tez trzymac w bazie danych
+    if zaklad.poziom not in mnozniki:
+        raise HTTPException(status_code=400, detail="Nieprawidłowy poziom gry!")
     if zaklad.poziom == 1:
         wylosowana = random.randint(1, 3)
     else:
@@ -71,13 +74,13 @@ def zagraj_w_kasynie(zaklad: schemas.PaczkaZakladu, db: Session = Depends(get_db
     
     if zaklad.typowanie == wylosowana:
         wygrana_kwota = (zaklad.stawka * mnozniki[zaklad.poziom]) #obliczenie wygranej na podstawie stawki i mnoznika
-        zmiana_salda = wygrana_kwota
+        zmiana_salda = wygrana_kwota - zaklad.stawka #wygrana, dodajemy wygrana_kwota do salda, ale odejmujemy stawke, bo gracz ja postawil
         wynik = "Wygrałeś!"
     else:
-        zmiana_salda -= zaklad.stawka #przegrana, odejmujemy stawke od salda
+        zmiana_salda = -zaklad.stawka #przegrana, odejmujemy stawke od salda
         wynik = "Przegrałeś!"
 
-    zaktualizowany_gracz = crud.zmien_saldo(db, gracz_id=zaklad.gracz_id, kwota=zmiana_salda)
+    zaktualizowany_gracz = crud.dodaj_do_salda(db, gracz_id=zaklad.gracz_id, kwota=zmiana_salda)
         
     return {
         "wynik_gry": wynik,
