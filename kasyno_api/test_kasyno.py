@@ -19,3 +19,14 @@ def test_rejestracja_nowego_uzytkownika():
     assert dane["saldo"] == 100
     assert "id" in dane # sprawdzenie czy  baza na pewno nadala ID
     
+def test_sprawdz_konto_gracza():
+    # sprawdzenie endpointu GET dla gracza o ID=1
+    odpowiedz = client.get("/konto/1")
+
+    # sprawdzenie czy odpowiedz ma status 200 (OK)
+    assert odpowiedz.status_code == 200
+
+    # rozpakowanie JSON z odpowiedzi i sprawdzenie danych
+    dane = odpowiedz.json()
+    assert dane["id"] == 1
+    #assert dane["saldo"] == 100
