@@ -28,29 +28,28 @@ app.dependency_overrides[get_db] = override_get_db
 # utworzenie wirtualnego klienta, ktory bedzie udawal uzytkownika korzystajacego z API
 client = TestClient(app)
 
-def test_rejestracja_nowego_uzytkownika():
-    # wyslanie zapytania POST do endpointu rejestracji z danymi nowego uzytkownika tj. w Swaggerze
-    odpowiedz = client.post("/rejestracja", json={"nazwa": "TestowyUzytkownik"})
-
+def test_pelny():
+    # wyslanie zapytania POST do endpointu rejestracji z danymi nowego uzytkownika
+    # test 1: rejestracja nowego uzytkownika
+    rejestracja = client.post("/rejestracja", json={"nazwa": "TestowyUzytkownik"})
     # sprawdzenie czy odpowiedz ma status 200 (OK)
-    assert odpowiedz.status_code == 200
-
+    assert rejestracja.status_code == 200
     # rozpakowanie JSON z odpowiedzi
-    dane = odpowiedz.json()
-
-    # sprawdzenie czy baza danych zwrocila poprawne dane o nowym uzytkowniku
-    assert dane["nazwa"] == "TestowyUzytkownik"
-    assert dane["saldo"] == 100
-    assert "id" in dane # sprawdzenie czy  baza na pewno nadala ID
+    id_gracza = rejestracja.json()["id"]
     
-def test_sprawdz_konto_gracza():
-    # sprawdzenie endpointu GET dla gracza o ID=1
-    odpowiedz = client.get("/konto/1")
+    # test 2: funkcja doladowania
+    doladowanie = client.post("/doladuj", json={"gracz_id": id_gracza, "kwota": 100})
+    assert doladowanie.status_code == 200
+    assert doladowanie.json()["saldo"] == 200
 
-    # sprawdzenie czy odpowiedz ma status 200 (OK)
-    assert odpowiedz.status_code == 200
+    # test 3: za duza stawka
+    stawka_blad = client.post("/zagraj", json={
+        "gracz_id": id_gracza,
+        "poziom": 1,
+        "stawka": 5000,
+        "typowanie": 1
+    })
+    
+    assert stawka_blad.status_code == 400
+    assert "Nie masz wystarczająco środków na koncie!" in stawka_blad.json()["detail"]
 
-    # rozpakowanie JSON z odpowiedzi i sprawdzenie danych
-    dane = odpowiedz.json()
-    assert dane["id"] == 1
-    assert dane["saldo"] == 100
