@@ -1,24 +1,27 @@
-# Kasyno REST API
+# Virtual Economy API
 
-Proste, ale w pełni funkcjonalne API backendowe do obsługi wirtualnego kasyna. Projekt powstał w celu praktycznego zastosowania dobrych praktyk inżynierii oprogramowania. 
+ProsteAPI backendowe do obsługi wirtualnej ekonomii, zarządzania portfelami użytkowników oraz symulacji inwestycji. Projekt powstał w celu praktycznego zastosowania dobrych praktyk inżynierii oprogramowania.
 
-Aplikacja symuluje architekturę prawdziwych systemów finansowych: posiada wyraźny podział na warstwy (routing, operacje CRUD, modele bazy danych), korzysta z relacyjnej bazy danych i rygorystycznie weryfikuje dane przychodzące od użytkownika.
+Aplikacja symuluje architekturę nowoczesnych systemów finansowych: posiada wyraźny podział na warstwy (routing, operacje CRUD, modele bazy danych), korzysta z relacyjnej bazy danych, weryfikuje dane przychodzące i jest pokryta testami automatycznymi.
 
 ## Wykorzystane technologie
 
-* **Python 3**
-* **FastAPI** (błyskawiczne tworzenie endpointów i automatyczna dokumentacja Swagger)
+* **Python 3.11+**
+* **FastAPI** (tworzenie endpointów i automatyczna dokumentacja Swagger)
 * **SQLAlchemy** (obsługa bazy danych poprzez mapowanie obiektowo-relacyjne ORM)
 * **SQLite** (lekka, plikowa baza danych)
 * **Pydantic** (walidacja paczek JSON i kontrola typów)
-* **Uvicorn** (serwer ASGI)
+* **pytest** (zautomatyzowane testy jednostkowe z izolowaną bazą testową)
+* **GitHub Actions** (Continuous Integration - automatyczne testowanie kodu w chmurze)
+* **python-dotenv** (zarządzanie zmiennymi środowiskowymi)
 
 ## Główne funkcjonalności
 
-1. **Rejestracja gracza** (przypisanie unikalnego ID oraz początkowego salda 100 zł).
+1. **Rejestracja użytkownika** (przypisanie unikalnego ID oraz początkowego salda 100 jednostek).
 2. **Sprawdzanie stanu konta** (odczyt danych z bazy).
-3. **Doładowanie portfela** (transakcje modyfikujące saldo).
-4. **Gra w kasynie** (obstawianie na różnych poziomach trudności). Logika gry jest w pełni zabezpieczona przed ujemnymi stawkami oraz grą bez wystarczających środków na koncie. Operacje finansowe opierają się na bezpiecznych transakcjach bazodanowych.
+3. **Wpłaty** (transakcje modyfikujące saldo).
+4. **Symulacja Inwestycji** (procesowanie transakcji na różnych poziomach ryzyka z symulacją zmienności rynku). Logika operacji jest zabezpieczona przed ujemnymi stawkami oraz działaniami bez posiadania wystarczających środków na koncie.
+5. **Bezpieczeństwo konfiguracji** (wrażliwe dane i adresy odczytywane są z ukrytego pliku `.env`).
 
 ## Jak uruchomić projekt lokalnie?
 
@@ -26,14 +29,20 @@ Aplikacja symuluje architekturę prawdziwych systemów finansowych: posiada wyra
 2. Upewnij się, że masz zainstalowanego Pythona, a następnie zainstaluj wymagane biblioteki:
    ```bash
    pip install -r requirements.txt
-3. Uruchom serwer developerski Uvicorn:
-    ```bash
+3. Stwórz plik .env w głównym folderze projektu i dodaj w nim adres bazy danych:
+    ```
+    DATABASE_URL=sqlite:///./economy.db
+4. Uruchom serwer developerski Uvicorn:
+    ```
     uvicorn main:app --reload
-4. Baza danych (kasyno.db) wygeneruje się automatycznie przy pierwszym uruchomieniu.
 
 ## Testowanie API
-Projekt nie posiada własnego frontendu, ponieważ skupia się wyłącznie na architekturze backendowej. Aby przetestować aplikację, po uruchomieniu serwera wejdź w przeglądarce pod adres:
+Projekt posiada zautomatyzowane testy, które dzięki mechanizmowi dependency overrides działają na odizolowanej bazie danych (test_economy.db).
 
-http://localhost:8000/docs
+Aby uruchomić testy, wpisz w terminalu:
+    ```
+    pytest
 
-Otworzy się interaktywna dokumentacja Swagger UI, z poziomu której możesz zakładać konta, wpłacać środki i wysyłać zakłady.
+Aby przetestować aplikację manualnie z poziomu interfejsu graficznego, po uruchomieniu serwera należy wejść w przeglądarce pod adres:
+    ```
+    http://localhost:8000/docs
