@@ -44,5 +44,5 @@ Aby uruchomić testy, wpisz w terminalu:
     pytest
 
 Aby przetestować aplikację manualnie z poziomu interfejsu graficznego, po uruchomieniu serwera należy wejść w przeglądarce pod adres:
-    ```
+    
     http://localhost:8000/docs
