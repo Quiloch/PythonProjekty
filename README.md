@@ -1,6 +1,6 @@
 # Virtual Economy API
 
-ProsteAPI backendowe do obsługi wirtualnej ekonomii, zarządzania portfelami użytkowników oraz symulacji inwestycji. Projekt powstał w celu praktycznego zastosowania dobrych praktyk inżynierii oprogramowania.
+Proste API backendowe do obsługi wirtualnej ekonomii, zarządzania portfelami użytkowników oraz symulacji inwestycji. Projekt powstał w celu praktycznego zastosowania dobrych praktyk inżynierii oprogramowania.
 
 Aplikacja symuluje architekturę nowoczesnych systemów finansowych: posiada wyraźny podział na warstwy (routing, operacje CRUD, modele bazy danych), korzysta z relacyjnej bazy danych, weryfikuje dane przychodzące i jest pokryta testami automatycznymi.
 
@@ -30,9 +30,9 @@ Aplikacja symuluje architekturę nowoczesnych systemów finansowych: posiada wyr
    ```bash
    pip install -r requirements.txt
 3. Stwórz plik .env w głównym folderze projektu i dodaj w nim adres bazy danych:
-    ```
-    DATABASE_URL=sqlite:///./economy.db
-4. Uruchom serwer developerski Uvicorn:
+   ```
+   DATABASE_URL=sqlite:///./economy.db
+5. Uruchom serwer developerski Uvicorn:
     ```
     uvicorn main:app --reload
 
