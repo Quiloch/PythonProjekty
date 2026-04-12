@@ -4,7 +4,7 @@ class PaczkaInwestycji(BaseModel):
     uzytkownik_id: int #Dodany parametr, aby moc identyfikowac uzytkownika
     poziom_ryzyka: int
     kwota: int
-    typowanie: int
+    prognoza: int
 
 class PaczkaWplaty(BaseModel):
     uzytkownik_id: int #Dodany parametr, aby moc identyfikowac uzytkownika
