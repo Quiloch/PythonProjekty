@@ -40,7 +40,7 @@ Aplikacja symuluje architekturę nowoczesnych systemów finansowych: posiada wyr
 Projekt posiada zautomatyzowane testy, które dzięki mechanizmowi dependency overrides działają na odizolowanej bazie danych (test_economy.db).
 
 Aby uruchomić testy, wpisz w terminalu:
-    ```
+    
     pytest
 
 Aby przetestować aplikację manualnie z poziomu interfejsu graficznego, po uruchomieniu serwera należy wejść w przeglądarce pod adres:
