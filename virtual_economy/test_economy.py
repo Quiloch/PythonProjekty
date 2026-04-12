@@ -50,6 +50,6 @@ def test_pelny():
         "prognoza": 1
     })
     
-    assert  inwestycja_blad.status_code == 400
+    assert inwestycja_blad.status_code == 400
     assert "Nie masz wystarczająco środków na koncie!" in inwestycja_blad.json()["detail"]
 
