@@ -49,9 +49,9 @@ def wykonaj_transakcje(inwestycja: schemas.PaczkaInwestycji, db: Session = Depen
     if not uzytkownik:
         raise HTTPException(status_code=404, detail="Nie znaleziono takiego uzytkownika")
     
-    if inwestycja.stawka > uzytkownik.saldo:
+    if inwestycja.kwota > uzytkownik.saldo:
         raise HTTPException(status_code=400, detail="Nie masz wystarczająco środków na koncie!")
-    if inwestycja.stawka <= 0:
+    if inwestycja.kwota <= 0:
         raise HTTPException(status_code=400, detail="Kwota musi być większa niż 0!") 
            
     mnozniki = {1: 2, 2: 5} #mnozniki dla poziomow ryzyka; 1- niskie, 2-wysokie
@@ -65,8 +65,8 @@ def wykonaj_transakcje(inwestycja: schemas.PaczkaInwestycji, db: Session = Depen
     
     # rozliczenie
     if inwestycja.prognoza == wylosowana:
-        wygrana_kwota = (inwestycja.kwota * mnozniki[inwestycja.poziom_ryzyka]) #obliczenie wygranej na podstawie stawki i mnoznika
-        zmiana_salda = wygrana_kwota - inwestycja.kwota #wygrana, dodajemy wygrana_kwota do salda, ale odejmujemy stawke, bo uzytkownik ja postawil
+        wygrana_kwota = (inwestycja.kwota * mnozniki[inwestycja.poziom_ryzyka]) #obliczenie wygranej na podstawie kwoty i mnoznika
+        zmiana_salda = wygrana_kwota - inwestycja.kwota #wygrana, dodajemy wygrana_kwota do salda, ale odejmujemy kwote, bo uzytkownik ja postawil
         wynik = "Zysk! Prognoza była trafna!"
     else:
         zmiana_salda = -inwestycja.kwota #przegrana, odejmujemy kwotę od salda
