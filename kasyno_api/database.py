@@ -1,10 +1,16 @@
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# Utworzenie pliku bazy danych kasyno.db w tym samym katalogu
-SQLALCHEMY_DATABASE_URL = "sqlite:///./kasyno.db"
+# Wczytanie zmiennych środowiskowych z pliku .env
+load_dotenv()
 
-# Stworzenie silka, ktory bedzie wykonywal komendy SQL
+# Utworzenie pliku bazy danych kasyno.db w tym samym katalogu
+# Wyciagniecie adresu bazy danych z pliku
+SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL")
+
+# Stworzenie silnika, ktory bedzie wykonywal komendy SQL
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
