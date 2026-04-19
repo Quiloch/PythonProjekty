@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from database import Base 
 
 class Character(Base):
@@ -13,6 +14,7 @@ class Character(Base):
     energy = Column(Integer, default=100)
     strength = Column(Integer, default=1)
 
+    items = relationship("Item", back_populates="owner")
 
 class Item(Base):
     __tablename__ = "items"
@@ -22,3 +24,5 @@ class Item(Base):
     description = Column(String)
     value = Column(Integer)
     character_id = Column(Integer, ForeignKey("characters.id"))
+
+    owner = relationship("Character", back_populates="items")
